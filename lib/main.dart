@@ -59,19 +59,20 @@ class _DonationPageState extends State<DonationPage> {
       },
     );
 
-    final launchable = await canLaunchUrl(uri);
-    if (!launchable) {
-      if (!mounted) return;
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalNonBrowserApplication,
+    );
+
+    if (!launched && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No UPI app is installed to receive this payment.'),
+          content: Text(
+            'No supported UPI app was opened. Install BHIM, PhonePe, Paytm or Google Pay and try again.',
+          ),
         ),
       );
-      return;
     }
-
-    if (!mounted) return;
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
