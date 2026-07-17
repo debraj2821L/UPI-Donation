@@ -121,7 +121,7 @@ class _DonationPageState extends State<DonationPage> {
             FilledButton.icon(
               onPressed: _openUpiPayment,
               icon: const Icon(Icons.payment),
-              label: const Text('Donate ₹100'),
+              label: const Text('Donate'),
             ),
             const SizedBox(height: 12),
             TextButton(
