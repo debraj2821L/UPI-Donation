@@ -33,8 +33,8 @@ class _DonationPageState extends State<DonationPage> {
   final TextEditingController _amountController = TextEditingController(
     text: '100',
   );
-  final String _upiId = 'debrajpratihar@upi';
-  final String _payeeName = 'Debraj';
+  final String _upiId = 'debrajpratihar@jio';
+  final String _payeeName = 'Debraj Pratihar';
 
   Future<void> _openUpiPayment() async {
     final amount = _amountController.text.trim();
@@ -47,16 +47,8 @@ class _DonationPageState extends State<DonationPage> {
       return;
     }
 
-    final uri = Uri(
-      scheme: 'upi',
-      host: 'pay',
-      queryParameters: {
-        'pa': _upiId,
-        'pn': _payeeName,
-        'am': parsedAmount.toStringAsFixed(2),
-        'cu': 'INR',
-        'tn': 'Donation',
-      },
+    final uri = Uri.parse(
+      'upi://pay?pa=$_upiId&pn=$_payeeName&am=${parsedAmount.toStringAsFixed(2)}&cu=INR&tn=Donation',
     );
 
     final launched = await launchUrl(
