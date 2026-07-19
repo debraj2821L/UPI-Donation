@@ -6,7 +6,7 @@ void main() {
     await tester.pumpWidget(const DonationApp());
 
     expect(find.text('Donate to Debraj'), findsOneWidget);
-    expect(find.textContaining('debrajpratihar@upi'), findsOneWidget);
-    expect(find.text('Donate ₹100'), findsOneWidget);
+    expect(find.textContaining('debrajpratihar@jio'), findsOneWidget);
+    expect(find.text('Generate QR Code'), findsOneWidget);
   });
 }

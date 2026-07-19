@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
@@ -47,14 +48,19 @@ class _DonationPageState extends State<DonationPage> {
       return;
     }
 
-    final uri = Uri.parse(
-      'upi://pay?pa=$_upiId&pn=$_payeeName&am=${parsedAmount.toStringAsFixed(2)}&cu=INR&tn=Donation',
+    final uri = Uri(
+      scheme: 'upi',
+      host: 'pay',
+      queryParameters: {
+        'pa': _upiId,
+        'pn': _payeeName,
+        'am': parsedAmount.toStringAsFixed(2),
+        'cu': 'INR',
+        'tn': 'Donation',
+      },
     );
 
-    final launched = await launchUrl(
-      uri,
-      mode: LaunchMode.externalNonBrowserApplication,
-    );
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
 
     if (!launched && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,6 +71,41 @@ class _DonationPageState extends State<DonationPage> {
         ),
       );
     }
+  }
+
+  String _buildUpiString() {
+    final amount = _amountController.text.trim();
+    final parsedAmount = double.tryParse(amount);
+    if (parsedAmount == null || parsedAmount <= 0) {
+      return 'upi://pay?pa=$_upiId&pn=$_payeeName&cu=INR&tn=Donation';
+    }
+    return 'upi://pay?pa=$_upiId&pn=$_payeeName&am=${parsedAmount.toStringAsFixed(2)}&cu=INR&tn=Donation';
+  }
+
+  void _showQrDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        final upiString = _buildUpiString();
+        return AlertDialog(
+          title: const Text('Scan to pay'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              QrImageView(data: upiString, version: QrVersions.auto, size: 220),
+              const SizedBox(height: 12),
+              Text('UPI ID: $_upiId'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -114,6 +155,12 @@ class _DonationPageState extends State<DonationPage> {
               onPressed: _openUpiPayment,
               icon: const Icon(Icons.payment),
               label: const Text('Donate'),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _showQrDialog,
+              icon: const Icon(Icons.qr_code_2),
+              label: const Text('Generate QR Code'),
             ),
             const SizedBox(height: 12),
             TextButton(
